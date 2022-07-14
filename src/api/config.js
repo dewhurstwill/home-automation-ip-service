@@ -2,7 +2,7 @@ module.exports = {
   host: process.env.HOST || '',
   server: process.env.SERVER || '',
   dns: {
-    enabled: process.env.DNS === true,
+    enabled: process.env.DNS === 'true',
     tenantId: process.env.AZURERM_TENANT_ID
       || process.env.ARM_TENANT_ID
       || process.env.TENANT_ID
