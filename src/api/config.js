@@ -35,24 +35,33 @@ module.exports = {
     }, {
       path: '/api/v1/ip/current',
       methods: ['GET'],
-      description: 'Returns the public IP of the requestor'
+      description: 'Returns the public IP of the requestor',
+      queryParams: '?saturate=true - this will add geographic data about the IP to the response'
     }, {
       path: '/api/v1/ip/client',
       methods: ['GET'],
-      description: 'Returns the public IP of the requestor'
+      description: 'Returns the public IP of the requestor',
+      queryParams: '?saturate=true - this will add geographic data about the IP to the response'
     }, {
       path: '/api/v1/ip/server',
       methods: ['GET'],
-      description: 'Returns the public IP of the server'
+      description: 'Returns the public IP of the server',
+      queryParams: '?saturate=true - this will add geographic data about the IP to the response'
     }, {
       path: '/api/v1/ip/dns',
       methods: ['GET'],
-      description: `Returns the IP of the DNS record at the apex of ${process.env.DNS_ZONE || 'x'}`
+      description: `Returns the IP of the DNS record at the apex of ${process.env.DNS_ZONE || 'x'}`,
+      queryParams: '?saturate=true - this will add geographic data about the IP to the response'
     }, {
       path: '/api/v1/ip/dns/:record',
       methods: ['GET'],
-      description: `Returns the IP of a specific DNS record under the ${process.env.DNS_ZONE || 'x'} zone`
+      description: `Returns the IP of a specific DNS record under the ${process.env.DNS_ZONE || 'x'} zone`,
+      queryParams: '?saturate=true - this will add geographic data about the IP to the response'
+    },{
+      path: '/api/v1/geo-ip/:ipAddress',
+      methods: ['GET'],
+      description: 'Returns the geographic info about the IP'
     }],
     description: process.env.DESCRIPTION || 'Service for attaining client current IP address or home network/server current IP address',
   }
-}
+};

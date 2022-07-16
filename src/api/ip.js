@@ -1,7 +1,13 @@
 const express = require('express');
 const config = require('./config');
 const {
-  getPublicIp,
+  getClientIp,
+  getServerIp
+} = require('../helpers/routeHelpers');
+
+const {
+  getIpGeo,
+  isIPv4,
   getToken,
   listDnsZone,
   getARecord
@@ -9,11 +15,9 @@ const {
 
 const router = express.Router();
 
-const getClientIp = (req) => req.clientIp;
-
-router.get('/current', (req, res) => res.json({ ip: getClientIp(req) }));
-router.get('/client', (req, res) => res.json({ ip: getClientIp(req) }));
-router.get('/server', async (req, res) => res.json({ ip: await getPublicIp() }));
+router.get('/current', async (req, res) => getClientIp(req, res));
+router.get('/client', (req, res) => getClientIp(req, res));
+router.get('/server', async (req, res) => getServerIp(req, res));
 router.get('/dns', (req, res) => res.redirect('/api/v1/ip/dns/@'));
 router.get('/dns/:record', async (req, res) => {
   const { record: requestedRecord } = req.params;
@@ -27,6 +31,7 @@ router.get('/dns/:record', async (req, res) => {
   }
 
   try {
+    const response = {};
     const record = await getARecord(
       token,
       config.dns.subscriptionId,
@@ -40,9 +45,16 @@ router.get('/dns/:record', async (req, res) => {
       && record.properties.ARecords
       && record.properties.ARecords.length > 0
     ) {
-      return res.json({
-        ip: record.properties.ARecords[0].ipv4Address
-      });
+      response.ip = record.properties.ARecords[0].ipv4Address;
+      if (req.query.saturate === 'true') {
+        if (!isIPv4(response.ip)) {
+          return res.status(422).json({
+            message: 'To saturate request the requested IP must be IPv4'
+          });
+        }
+        response.geographicInfo = await getIpGeo(response.ip);
+      }
+      return res.json(response);
     }
 
     return res.status(404).json({ message: 'Record not found' });
